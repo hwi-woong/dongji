@@ -902,53 +902,6 @@ html.big .thg{grid-template-columns:repeat(2,minmax(0,1fr))}
 /* 강조 색 위 글자는 --on(밝은 색이면 검은 글자) */
 .pst li.on,.tabs .t button b.cn.on,.dtag.out,.ord1 .dd.on{color:var(--on,#fff)}
 .todo li.dn .cb{color:var(--on,#fff)}
-/* 8) 더보기 동지 게임(사용자 2026-11-19) */
-.menu .games .gh2{display:grid;gap:2px;padding:14px 16px 6px}
-.menu .games .gh2 b{font-size:var(--t3);font-weight:800}
-.menu .games>.grow2{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:12px;min-height:66px;padding:10px 16px;border-top:1px solid var(--line2);cursor:pointer;color:var(--ink);text-decoration:none}
-.menu .games>.gh2+.grow2{border-top:0}
-.menu .games>.grow2:hover{background:var(--tile)}
-.menu .games>.grow2:focus-visible{outline:2px solid var(--c);outline-offset:-2px;border-radius:16px}
-.menu .games .gall b{color:var(--ec,var(--c))}
-.gart{flex:none;width:46px;height:46px;border-radius:12px}
-.gart.big{width:64px;height:64px}
-.gsh .gtop{display:flex;align-items:center;gap:14px}
-.gsh .gtop h2{font-size:var(--t2)}
-.gsh .gtop .small{margin:2px 0 0}
-.gsay{background:var(--soft);border-radius:14px;padding:12px 14px;display:grid;gap:4px}
-.gsay b{font-size:var(--t5);color:var(--sub)}
-.gsay p{font-size:var(--t4);line-height:1.6}
-.gqr{display:grid;justify-items:center;gap:6px;padding:4px 0}
-.gqr img{width:210px;height:210px;image-rendering:pixelated;border-radius:12px;background:#fff;padding:4px}
-.gqr p{font-size:var(--t5);color:var(--sub)}
-.gsh .gnote{margin:0}
-/* 9) 게임 '우리 매장 혜택'(2026-11-18 사용자: 서버 스위치+매장별 혜택) */
-.menu .games>.gperk .gic{flex:none;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--ec,var(--c)) 13%,var(--panel));color:var(--ec,var(--c))}
-.menu .games>.gperk .gtx{flex:1;min-width:0;display:grid}
-.menu .games>.gperk .gtx small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.menu .games>.gperk .tag{flex:none}
-.menu .games>.gperk:disabled{cursor:default;opacity:.75}
-.psh{gap:14px}
-.psh h2{font-size:var(--t2)}
-.psh .pex{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.psh .pex .small{flex-basis:100%}
-.psh .pex .mini{height:auto;min-height:34px;padding:6px 12px;white-space:normal;text-align:left;line-height:1.35}
-.pprev{border:1.5px solid var(--ec,var(--c));border-radius:16px;padding:12px 14px;display:grid;gap:2px;background:var(--panel)}
-.pprev b{font-size:12.5px;color:var(--ec,var(--c))}
-.pprev .s{font-size:12.5px;color:var(--sub);font-weight:600}
-.pprev .t{font-size:var(--t4);font-weight:700;word-break:keep-all;overflow-wrap:anywhere}
-.pprev .n{font-size:12.5px;color:var(--sub);margin-top:4px}
-/* 본사 게임 혜택 관리 화면(game-perk.html) */
-.gpa-sw{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 18px;border-radius:16px;border:1.5px solid var(--line)}
-.gpa-sw.is-on{border-color:var(--ok);background:var(--okbg)}
-.gpa-sw.is-off{border-color:var(--amber);background:var(--amberbg)}
-.gpa-sw>div:first-child{flex:1 1 240px;min-width:0}
-.gpa-sw b{font-size:18px}
-.gpa-f{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.gpa-f input{flex:1 1 220px}
-.gpa-f .mini[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.top .rt .lnk-m{display:inline-flex;align-items:center;text-decoration:none;color:inherit}
-@media (max-width:560px){.top .rt .lnk-m{display:none}}
 /* 10. 받은 알림·휴대폰 알림(2026-11-19) */
 .ntc{border:1.5px solid var(--ec,var(--c));border-radius:18px;background:var(--panel);padding:14px 16px;display:grid;gap:6px;margin-bottom:14px;box-shadow:var(--sh)}
 .ntc .k,.ntlist .k{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0;font-size:var(--t5);color:var(--sub);font-weight:600}
@@ -1273,12 +1226,6 @@ html.v7 .list.l2 li.row2.ag .nm::before{content:"";display:inline-block;width:8p
 .pbar .wrap{position:relative}
 .fx-ob .obgo{background:none;border:0;color:var(--sub);font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:10px;justify-self:center}
 .fx-ob .bd b{color:var(--ec,var(--c))}
-/* 미리보기 전용: 앱 안에서 게임 열기 */
-.v7gp{position:fixed;inset:0;z-index:400;background:#000;display:flex;flex-direction:column}
-.v7gp .gpb{display:flex;align-items:center;gap:10px;background:var(--bg);padding:8px 12px;border-bottom:1px solid var(--line2)}
-.v7gp .gpb button{border:1px solid var(--line);background:var(--panel);border-radius:10px;height:40px;padding:0 14px;font-weight:700;cursor:pointer}
-.v7gp .gpb span{font-size:13px;color:var(--sub)}
-.v7gp iframe{flex:1;width:100%;border:0;background:#fff}
 
 /* ── v8 한눈에 구성(2026-11-23) ── */
 html.v8 .split.one-col.tabbed .steps,html.v8 .steps.today{gap:16px}
