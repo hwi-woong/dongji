@@ -1,0 +1,33 @@
+/* 처음 실행 가이드(2026-11-23) */
+.fg{position:fixed;inset:0;z-index:9999;background:rgba(20,16,14,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+body.fg-open{overflow:hidden}
+.fg-box{background:var(--panel,#fff);color:var(--ink,#1d1d1f);width:min(980px,100%);max-height:calc(100vh - 32px);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;outline:none}
+.fg-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line,#e5e0da)}
+.fg-k{font-size:14px;color:var(--sub,#6b6b6b)}
+.fg-k b{color:var(--c,#6e0e00);font-size:16px}
+.fg-x{all:unset;cursor:pointer;font-size:14px;color:var(--sub,#6b6b6b);padding:6px 8px;border-radius:8px}
+.fg-x:hover{background:var(--tile,#f3f0ec)}
+.fg-body{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;padding:18px;overflow:auto}
+.fg-fig{margin:0;background:var(--tile,#f3f0ec);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:200px}
+.fg-fig img{display:block;max-width:100%;max-height:min(60vh,520px);height:auto;border-radius:8px}
+.fg-txt h2{margin:4px 0 12px;font-size:22px;line-height:1.35;letter-spacing:-.01em}
+.fg-txt ol{margin:0;padding-left:22px;display:grid;gap:10px;font-size:16px;line-height:1.6}
+.fg-note{margin:16px 0 0;font-size:13px;color:var(--sub,#6b6b6b)}
+.fg-ft{display:flex;align-items:center;gap:10px;padding:12px 18px;border-top:1px solid var(--line,#e5e0da)}
+.fg-dots{display:flex;gap:6px;margin-right:auto}
+.fg-dots i{width:9px;height:9px;border-radius:50%;background:var(--line,#e5e0da)}
+.fg-dots i.done{background:var(--sub,#9a9a9a)}
+.fg-dots i.on{background:var(--c,#6e0e00);width:22px;border-radius:5px}
+.fg-b{all:unset;cursor:pointer;box-sizing:border-box;min-width:96px;text-align:center;padding:11px 20px;border-radius:999px;background:var(--c,#6e0e00);color:#fff;font-size:16px;font-weight:700}
+.fg-b.gh{background:transparent;color:var(--ink,#1d1d1f);border:1px solid var(--line,#d9d3cc)}
+.fg-b:focus-visible,.fg-x:focus-visible{outline:3px solid #e8590c;outline-offset:2px}
+@media (max-width:760px){
+  .fg{padding:0;align-items:stretch}
+  .fg-box{border-radius:0;max-height:none;height:100%;width:100%}
+  .fg-body{grid-template-columns:1fr;gap:14px;padding:14px 16px}
+  .fg-fig img{max-height:46vh}
+  .fg-txt h2{font-size:20px}
+  .fg-txt ol{font-size:16px}
+  .fg-ft{padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  .fg-b{min-width:84px;padding:12px 18px}
+}
