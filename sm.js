@@ -23,7 +23,6 @@
     var pd = pdays(r); if (pd != null) f.push([pdl(pd), 't-info']);
     return f;
   }
-  function needs(r) { return r.stage === '미참여' || r.stage === '접속만' || flags(r).some(function (x) { return x[1] !== 't-ok'; }); }
   function pct(a, b) { return b ? Math.round(a / b * 100) + '%' : '없음'; }
   function ago(iso) { if (!iso) return '없음'; var d = Math.floor((new Date(S.now) - new Date(iso)) / 864e5); return d <= 0 ? '오늘' : d + '일 전'; }
   function sum(k, A) { return (A || S.rows).reduce(function (a, r) { return a + Number(r[k] || 0); }, 0); }
@@ -84,24 +83,6 @@
     if (w === 'stale') return hd + '관심 있다고 한 곳에 제안서를 보내 보셨나요? 그 곳을 누르면 이름이 들어간 제안서를 바로 문자·카톡으로 보낼 수 있어요.';
     if (w === 'lock') return hd + '로그인이 잠겨 있어 풀어 드렸어요. 다시 들어가 보세요.';
     return hd + '주문 받으신 것 축하드려요! 받는 날에 맞춰 준비 부탁드립니다.';
-  }
-  function careList(R) {
-    var A = R.map(function (r) { return { r: r, w: why(r) }; }).filter(function (x) { return x.w; });
-    var L = A.filter(function (x) { return x.w !== 'none' && x.w !== 'auth'; }), N0 = A.length - L.length;
-    L.sort(function (a, b) { return WHY[b.w][2] - WHY[a.w][2] || (b.r.contacted - a.r.contacted); });
-    var praise = R.filter(function (r) { return r.orders > 0; }).sort(function (a, b) { return b.qty - a.qty; });
-    var cnt = {}; L.forEach(function (x) { cnt[x.w] = (cnt[x.w] || 0) + 1; });
-    var showSm = S.me.role !== 'sm', top = L.slice(0, S.cmore ? 30 : 10);
-    return '<section class="step care"><div class="hd"><h2>오늘 챙길 매장 <small>' + L.length + '곳</small></h2>' +
-      '<p class="small">' + ['lock', 'stale', 'away', 'idle'].filter(function (k) { return cnt[k]; }).map(function (k) { return WHY[k][0] + ' ' + cnt[k]; }).join(' · ') + '</p></div>' +
-      (N0 ? '<div class="none0"><span><b>아직 로그인 안 한 매장 ' + U.won(N0) + '곳</b><small>한 곳씩 말고, 같은 안내를 한꺼번에 보내세요</small></span><button class="btn sm ghost" type="button" data-act="pnew" data-c="none">한꺼번에 알림</button><button class="btn sm ghost" type="button" data-act="f" data-f="미참여">목록 보기</button></div>' : '') +
-      (top.length ? '<ul class="cl">' + top.map(function (x) {
-        var r = x.r, w = WHY[x.w];
-        return '<li><button type="button" class="tx" data-act="row" data-id="' + r.id + '"><b>' + esc(r.name) + '</b><span><span class="tag ' + w[1] + '">' + w[0] + '</span>' + (showSm ? esc(r.sm || '') + ' · ' : '') + '연락 ' + r.contacted + '/' + r.target + '</span></button>' +
-          '<button class="btn sm ghost" type="button" data-act="pnew" data-id="' + r.id + '" data-w="' + x.w + '">알림 보내기</button></li>';
-      }).join('') + '</ul>' : '<p class="box">챙길 매장이 없습니다. 모두 잘 하고 있어요.</p>') +
-      (L.length > top.length ? '<button class="lnk2" type="button" data-act="cmore">' + (S.cmore ? '' : '챙길 매장 더 보기 ›') + '</button>' : '') +
-      (praise.length ? '<div class="praise"><b>칭찬할 매장</b><span>' + praise.slice(0, 6).map(function (r) { return '<button type="button" class="chip" data-act="row" data-id="' + r.id + '">' + esc(r.name) + ' · ' + U.won(r.qty) + '인분</button>'; }).join('') + (praise.length > 6 ? '<i>외 ' + (praise.length - 6) + '곳</i>' : '') + '</span></div>' : '') + '</section>';
   }
   function tiles4(R) {
     var N = R.length, joined = R.filter(function (r) { return r.stage !== '미참여'; }).length, doing = R.filter(function (r) { return r.stage === '실행' || r.stage === '완료'; }).length;
@@ -1035,10 +1016,6 @@
     var E = S.evs.filter(function (e) { return S.sum[e.id] && !S.sum[e.id].hq; }), lp = noPush() ? null : (S.push || []).find(function (x) { return x.by === S.me.name; });
     return '<section class="hero3 sm"><h1>' + esc(S.me.name) + '님, 오늘 챙길 사장님이에요</h1><p>' + E.map(function (e) { return esc(e.name) + ' <b>' + U.won(S.sum[e.id].care) + '곳</b>'; }).join(' · ') + '</p>' +
       (lp ? '<p class="lp">지난 알림 \'' + esc(lp.title) + '\' 읽음 ' + pct(lp.read, lp.n) + ' · ' + mvTxt(lp) + ' <button class="lnk" type="button" data-act="pg" data-p="sent">보낸 알림 ›</button></p>' : '') + '</section>';
-  }
-  function evTabs() {
-    return S.evs.length > 1 ? '<section class="step"><h2 class="q">행사. <span>어느 행사를 볼까요?</span></h2><div class="tabs"><div class="t" role="tablist" aria-label="행사">' +
-      S.evs.map(function (e) { return '<button type="button" role="tab" data-act="ev" data-id="' + esc(e.id) + '" aria-selected="' + (S.ev === e.id) + '">' + esc(e.name) + (e.mode === 'hq' ? ' <b>본사</b>' : '') + '</button>'; }).join('') + '</div></div></section>' : '';
   }
   async function allocSave(rows) {
     S.busy = true; render();
