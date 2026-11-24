@@ -168,11 +168,6 @@
     }).join('') + '</ul>' + (o.props.length && ev.mode === 'store' ? '<p class="small">특정 곳에 보낼 제안서는 연락할 곳 목록에서 그 곳을 누르면 이름을 넣어 바로 보낼 수 있습니다.</p>' : '') + '</section>';
   }
   // 다음 차례: 다시 연락할 곳 → 아직 연락 안 한 곳(목록 순서, 전화번호 있는 곳 먼저)
-  function nextUp(P, again) {
-    var todo = P.filter(function (p) { return !p.logs.length; });
-    var n = again[0] || todo.filter(function (p) { return p.tel; })[0] || todo[0]; if (!n) return '';
-    return '<button class="next" type="button" data-act="open" data-id="' + n.id + '"><span class="k">' + (again[0] ? '다시 연락할 차례' : '다음 차례') + '</span><b>' + esc(n.name) + '</b><span class="m">' + (n.tel ? esc(n.tel) : '전화번호 없음 · 들러 보기') + (n.km != null ? ' · ' + n.km + 'km' : '') + '</span><span class="go">열기</span></button>';
-  }
   function mapUrl(p) { var a = String(p.addr || '').split(' ').slice(0, 3).join(' '); return 'https://map.kakao.com/link/search/' + encodeURIComponent((a ? a + ' ' : '') + p.name); }
   function resName(l) { return l.m === '방문' && l.r === 'call' ? '들렀음' : RES[l.r][0]; }
   // 본사 진행 행사: 배정 수량 카드
@@ -186,19 +181,6 @@
         : '<div class="tipw">' + tip(1, '수량과 보내는 날을 보고 <b>확인했습니다</b>를 누르세요') + '<button class="btn block" type="button" data-act="aok"' + (S.busy ? ' disabled' : '') + '>확인했습니다</button></div><p class="small">누르면 ' + sm + ' 화면에 "확인함"으로 보입니다. 수량이 어려우면 누르기 전에 ' + sm + '에게 전화해 주세요.</p>') + '</div>';
   }
   function photo(e) { return /^img\/m_[a-z_]+\.jpg$/.test(e.photo || '') ? e.photo : 'img/bowl.jpg'; }
-  function sideInfo() {
-    var e = E(), s = sc();
-    var wide = window.matchMedia && window.matchMedia('(min-width: 900px)').matches;
-    return '<aside class="side" aria-label="행사 안내"><details class="evinfo"' + (wide || S.infoOpen ? ' open' : '') + '><summary>행사 안내 보기 <span>누구에게 · 일정 · 메뉴 · 주의할 점</span></summary><div class="ph">' + icons(e) + '<img src="' + photo(e) + '" alt=""></div>' +
-      '<p class="lead">' + esc(e.lead || '') + '</p>' +
-      '<div class="facts">' + (e.targets && e.targets.length ? '<div><h3>누구에게</h3><ul>' + e.targets.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>' : '') +
-      (e.schedule && e.schedule.length ? '<div><h3>일정</h3><ul>' + e.schedule.map(function (t) { return '<li><b>' + esc(t[0]) + '</b>' + esc(t[1]) + '</li>'; }).join('') + '</ul></div>' : '') +
-      (e.menu && e.menu.length ? '<div class="fm"><h3>메뉴 (1인분' + (e.side ? ', 절 공양용은 반찬 없이 죽만' : '') + ')</h3><table>' + e.menu.map(function (m) {
-        return '<tr><td>' + esc(m[0]) + '</td><td>' + (e.side ? won(m[1] - 1000) : won(m[1])) + '</td></tr>';
-      }).join('') + (e.side ? '<tr><td>기본 반찬을 넣으면</td><td>1,000원 더</td></tr>' : '') + '</table></div>' : '') + '</div>' +
-      (e.notes && e.notes.length ? '<div class="after"><h3>꼭 알아 두세요</h3><ul>' + e.notes.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>' : '') +
-      (e.mode === 'store' && s.how ? '<div class="after"><h3>이렇게 적어 주세요</h3><ol>' + s.how.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></div>' : '') + '</details></aside>';
-  }
   function infoSec() {
     var e = E(), s = sc();
     return '<section class="step"><h2 class="q">안내. <span>이번 행사 알아 두기</span></h2><div class="ph">' + icons(e) + '<img src="' + photo(e) + '" alt=""></div>' +
@@ -232,25 +214,6 @@
   }
   // 오늘 탭 맨 위: 이번 주 칭찬 한 줄 · 단체 매출 · 활동 단계(다른 매장 이름·점수는 보여 주지 않음)
   var LV = [[0, '새싹'], [50, '잎새'], [150, '꽃'], [300, '열매'], [600, '풍년']];
-  function weekCard() {
-    var w = S.week; if (!w || !w.ok) return '';
-    var c = w.week.contacts, line, sub = '';
-    if (w.pct != null && w.pct <= 10) line = '이번 주 연락 <b>상위 10%</b>예요. 정말 잘하고 계세요!';
-    else if (w.pct != null && w.pct <= 30) line = '이번 주 연락 <b>상위 30%</b>예요. 좋은 흐름이에요.';
-    else if (w.pct != null && w.pct <= 50) line = '이번 주 연락 <b>상위 50%</b>예요. 꾸준히 하고 계세요.';
-    else if (c > 0) line = '이번 주 <b>' + c + '곳</b>에 연락했어요. 한 걸음씩 가고 있어요.';
-    else line = '이번 주 첫 연락을 해 보세요. <b>한 곳</b>이면 시작입니다.';
-    var nx = w.pct == null || w.pct > 50 ? w.need.t50 : w.pct > 30 ? w.need.t30 : w.pct > 10 ? w.need.t10 : null;
-    if (nx && nx > w.pts) sub = '연락 ' + Math.ceil((nx - w.pts) / 10) + '곳이면 다음 단계(' + (w.pct == null || w.pct > 50 ? '상위 50%' : w.pct > 30 ? '상위 30%' : '상위 10%') + ')에 닿아요.';
-    var lv = LV.filter(function (x) { return w.pts_all >= x[0]; }).pop(), nl = LV.find(function (x) { return x[0] > w.pts_all; });
-    var lp = nl ? Math.round((w.pts_all - lv[0]) / (nl[0] - lv[0]) * 100) : 100;
-    return '<section class="week" aria-label="이번 주"><p class="praise">' + line + '</p>' + (sub ? '<p class="sub">' + sub + '</p>' : '') +
-      '<div class="wk"><div><span>우리 매장 단체 매출</span><b>' + won(w.sales.won) + '</b><small>' + U.won(w.sales.qty) + '인분</small></div>' +
-      '<div><span>이번 주 연락</span><b>' + c + '<i>곳</i></b><small>관심 ' + w.week.hot + ' · 주문 ' + w.week.orders + '건</small></div></div>' +
-      '<div class="lv"><span class="st">' + lv[1] + '</span><span class="bar"><i data-w="' + lp + '"></i></span><small>' + (nl ? nl[1] + '까지 ' + (nl[0] - w.pts_all) + '점' : '가장 높은 단계') + '</small></div>' +
-      (w.team ? '<p class="team">' + esc(w.team.name) + ' 매장들이 이번 주 함께 <b>' + w.team.contacts + '곳</b>에 연락했어요' + (w.nation && w.nation.qty ? ' · 전국 단체 주문 <b>' + U.won(w.nation.qty) + '인분</b>' : '') + '</p>'
-        : (w.nation && w.nation.qty ? '<p class="team">전국 단체 주문 <b>' + U.won(w.nation.qty) + '인분</b></p>' : '')) + '</section>';
-  }
   async function loadWeek() {
     if (!S.token || !S.ev || E().mode !== 'store') { S.week = null; return; }
     var ev = S.ev, r = await U.rpc('owner_week', { p_token: S.token, p_event: ev });
@@ -258,19 +221,6 @@
   }
   // 본사가 미리 해 둔 일(2026-11-21 사용자: 본사가 신경 써 줬다고 느끼게). 첫 연락 전까지, 또는 '알겠어요' 누르기 전까지
   function hqOff() { return U.store.get('bj_owner_hq_' + (E().id || '')) === '1'; }
-  function hqCard(P) {
-    var mine = P.filter(function (p) { return !p.custom; }), DD = window.Docs, np = DD ? DD.of(E().id).props.length : 0;
-    if (hqOff() || P.some(function (p) { return p.logs.length; })) return '';
-    var grp = {}; mine.forEach(function (p) { var w = who(p) || String(p.kind || '').split('·')[0]; if (w) grp[w] = (grp[w] || 0) + 1; });
-    var gs = Object.keys(grp).slice(0, 4).map(function (k) { return k + ' ' + grp[k]; }).join(' · ');
-    var sm = S.store && S.store.sm ? esc(S.store.sm) : '';
-    return '<section class="hqc" aria-label="본사가 준비해 둔 것"><p class="k">본사가 ' + (S.store ? esc(S.store.name) + eul(S.store.name) + ' 위해 ' : '') + '준비해 두었어요</p><ul>' +
-      (mine.length ? '<li>' + kic('pin') + '<span><b>근처 연락할 곳 ' + mine.length + '곳</b>을 전화번호까지 찾아 두었어요' + (gs ? '<small>' + esc(gs) + '</small>' : '') + '</span></li>'
-        : '<li>' + kic('pin') + '<span><b>근처 연락할 곳</b>은 지도에서 찾은 곳이 적었어요<small>' + (sm ? '담당 SM ' + sm + ' 님께 물어보시면 함께 찾아 드려요' : '담당 SM께 물어보시면 함께 찾아 드려요') + '</small></span></li>') +
-      (np ? '<li>' + kic('doc') + '<span><b>제안서 ' + np + '종</b>은 받는 곳 이름만 넣으면 완성돼요<small>우리 매장 이름·전화가 자동으로 들어가요</small></span></li>' : '') +
-      (mine.length ? '<li>' + kic('talk') + '<span><b>전화 첫마디</b>를 곳마다 적어 두었어요<small>읽기만 하시면 돼요</small></span></li>' : '') +
-      '</ul><button class="lnk" type="button" data-act="hqoff">알겠어요, 접기</button></section>';
-  }
   function eul(w) { var c = String(w || '').charCodeAt(String(w || '').length - 1) - 0xAC00; return c < 0 || c > 11171 ? '을(를)' : c % 28 ? '을' : '를'; }
   function kic(k) { return '<i class="ki"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + SVG[k] + '</svg></i>'; }
   // ── 오늘 탭(2026-11-18 사용자 선택: 첫 화면 1안 '오늘은 ○○에 전화해 볼까요?' + 4안 오늘 할 일 목록) ──
@@ -329,11 +279,6 @@
     return v8Today(P, pend, h0, n, hero);
   }
   // 매출 띠(사용자 2026-11-18: 매출이 위에 늘 보이게) — 오늘·연락할 곳 탭 머리줄 바로 아래 고정
-  function salesStrip(P) {
-    var w = S.week, cw = w && w.ok ? w.week.contacts : weekCount(P), parts = ['이번 주 연락 <b>' + cw + '곳</b>'], sold = w && w.ok ? w.sales.won > 0 : qtyAll() > 0;
-    if (w && w.ok && w.pct != null && w.pct <= 50) parts.push('<em>상위 ' + (w.pct <= 10 ? 10 : w.pct <= 30 ? 30 : 50) + '%</em>');
-    return '<button class="sstrip s1" type="button" data-act="tab" data-t="sales" aria-label="매출 탭 열기"><span class="l">단체 매출</span><b class="v">' + (sold ? (w && w.ok ? won(w.sales.won) : U.won(qtyAll()) + '인분') : '첫 주문을 기다려요') + '</b><span class="r">' + parts.join(' · ') + '</span><i aria-hidden="true">›</i></button>';
-  }
   function qtyAll() { return ((S.data && S.data.orders) || []).reduce(function (a, o) { return a + o.qty; }, 0); }
   function monday() { var d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d; }
   function weekCount(P) { var m = monday(), n = 0; P.forEach(function (p) { if (p.logs.some(function (l) { return new Date(l.at) >= m; })) n++; }); return n; }
@@ -465,21 +410,8 @@
     bt.onclick = async function () { el.hidden = true; if (undo) await undo(); };
     el.hidden = false; clearTimeout(snackT); snackT = setTimeout(function () { el.hidden = true; }, 5000);
   }
-  function sideCall(p) {
-    var e = E(), s = sc(), say = sayOf(p);
-    return '<aside class="side" aria-label="전화할 때"><div class="ph">' + icons(e) + '<img src="' + photo(e) + '" alt=""></div>' +
-      (say ? '<div class="after say-side"><h3>전화할 때 이렇게 말하세요' + (p.purpose ? ' · ' + esc(p.purpose) : '') + '</h3><p class="small">' + esc(say) + '</p></div>' : '') +
-      (s.ask ? '<div class="after"><h3>세 가지만 묻습니다</h3><ol>' + s.ask.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></div>' : '') +
-      (s.close ? '<div class="after"><h3>끊기 전에</h3><ul>' + s.close.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>' : '') +
-      '<div class="after"><h3>개인 연락처는 적지 않습니다</h3><p class="small">담당자 휴대폰 번호는 <b>사장님 휴대폰에만</b> 저장하고 메모에는 적지 마세요.</p></div>' +
-      (s.kit ? '<p class="small">' + esc(s.kit) + '</p>' : '') + '</aside>';
-  }
   var GW = { A: '작년 나눔', B: '큰 절', C: '작은 절' }, FLAG = { tel: '번호가 틀려요', closed: '문을 닫았어요', moved: '다른 곳으로 옮겼어요', dup: '목록에 두 번 있어요' };
   function word(p) { return p.custom ? '직접 추가' : p.grade ? (GW[p.grade] || p.grade) : String(p.kind || '').split('·')[0]; }
-  function badge(p) {
-    var c = p.custom ? '<span class="g X" aria-hidden="true">+</span>' : p.grade ? '<span class="g ' + p.grade + '" aria-hidden="true">' + p.grade + '</span>' : '<span class="g K" aria-hidden="true">' + esc((p.kind || '·').charAt(0)) + '</span>';
-    return '<span class="gb">' + c + '<small>' + esc(word(p)) + '</small></span>';
-  }
   function keep() {
     ['memo', 'back', 'oMenu', 'oQty', 'oDay', 'oSide', 'oMemo', 'nName', 'nTel', 'nKind'].forEach(function (id) { var e = U.$(id); if (e) S.form[id] = e.value; });
   }
@@ -487,14 +419,6 @@
   function buy(title, sub, btn) {
     return '<div class="buy"><div class="wrap"><div class="s"><b>' + title + '</b><span>' + sub + '</span></div>' + btn + '</div></div>';
   }
-  function evState(e) {
-    var td = U.today();
-    if (e.mode === 'hq') return ['본사 진행', 't-info'];
-    if (e.day && e.day < td) return ['지난 행사', 't-idle'];
-    if (e.deadline && e.deadline < td) return ['주문 마감 지남', 't-warn'];
-    return ['진행 중', 't-ok'];
-  }
-
   // ── 수정 후(2026-11-18 최종 점검) 공용 조각 ──
   // 받침에 따라 '으로/로'
   function ro(w) { var c = String(w || '').charCodeAt(String(w || '').length - 1) - 0xAC00; if (c < 0 || c > 11171) return '(으)로'; var j = c % 28; return j === 0 || j === 8 ? '로' : '으로'; }
@@ -517,12 +441,6 @@
   var TK = 'bj_owner_theme';
   var THEMES = [['', '행사 색'], ['#6E0E00', '팥색'], ['#B3261E', '빨강'], ['#B04A12', '주황'], ['#1E6B47', '초록'], ['#1F5FAD', '파랑'], ['#5E3A87', '보라'], ['#3D3A36', '먹색']];
   function myTheme() { var t = U.store.get(TK) || ''; return /^#[0-9a-fA-F]{6}$/.test(t) ? t : ''; }
-  function themeRow() {
-    var th = myTheme(), ev = E().color || '#6E0E00';
-    return '<div class="thm"><span class="thh"><b>앱 색</b><small>버튼과 강조 글자 색 · 이 휴대폰에만 저장돼요</small></span><div class="thg" role="group" aria-label="앱 색 고르기">' + THEMES.map(function (t) {
-      return '<button type="button" class="tc" data-act="theme" data-c="' + t[0] + '" data-ec="' + esc(t[0] || ev) + '" aria-pressed="' + (t[0] === th) + '"><i aria-hidden="true"></i>' + t[1] + '</button>';
-    }).join('') + '</div></div>';
-  }
   // 버튼 글자색: 그 색 위에서 흰 글자가 잘 안 읽히면(어두운 화면에서 밝아진 초록 등) 검은 글자
   function ink(hex) {
     var h = hex.replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&');
@@ -725,14 +643,6 @@
     }).join('') + '</section>';
   }
   // 4) 행사 도장 카드(스타벅스 e-프리퀀시: 기간 + 도장)
-  function evCard(P) {
-    if (!FX('evcard')) return '';
-    var e = E(), tg = target(); if (!tg) return '';
-    var called = P.filter(function (p) { return p.logs.length; }).length, q = qtyAll(), st = [];
-    for (var i = 0; i < tg; i++) st.push('<i' + (i < called ? ' class="on"' : '') + '>' + (i < called ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>' : i + 1) + '</i>');
-    return '<section class="fx-ev" aria-label="도장 카드"><div class="h"><b>' + esc(e.name || '') + ' 도장 카드</b><span>' + esc(e.deadlineLabel || e.dateLabel || '') + '</span></div><div class="stamps">' + st.join('') + '</div>' +
-      '<p class="s">연락할 때마다 도장 하나 · <b>' + Math.min(called, tg) + '/' + tg + '</b>' + (called >= tg ? ' · 다 모았어요!' : ' · ' + (tg - called) + '개 남았어요') + (q ? ' · 주문 <b>' + U.won(q) + '인분</b>' : '') + '</p></section>';
-  }
   // 5) 단계 막대(스타벅스 등급 막대 '조금만 더!') + 표정(당근 매너온도)
   var FACE = ['🙂', '😊', '😄', '🤩', '🥳'];
   function lvCard() {
@@ -850,11 +760,6 @@
       (b.got ? '<button class="btn block" type="button" data-act="bmy">내 배지 모두 보기</button>' : '') + '<button class="lnk" type="button" data-act="bx">닫기</button></div></div>';
   }
   // 13) 알림 허락 받기 전 설명(숨고)
-  function pushAsk() {
-    if (!FX('pushpre') || S.pushOn || U.store.get('bj_owner_pask') === '1' || E().mode === 'hq') return '';
-    return '<section class="fx-pa" aria-label="휴대폰 알림"><span class="ill" aria-hidden="true">' + BELL + '</span><h3>휴대폰 알림을 켜고<br><em>중요한 소식</em>을 받아 보세요</h3><p>담당 SM·본사 안내, 행사 마감 소식 등</p>' +
-      '<div class="pv" aria-hidden="true"><span>본죽 단체주문 알림</span><i>ON</i></div><button class="btn block" type="button" data-act="paon">알림 받기</button><button class="lnk" type="button" data-act="paoff">나중에 받기</button></section>';
-  }
   // 14) 본사 공지 창 + '오늘 하루 보지 않기'(올리브영·캐치테이블)
   function pnPick() {
     if (!FX('popnote') || S.pnDone || S.view !== 'home' || obOpen() || S.bp) return null;
@@ -894,43 +799,10 @@
   // 글자 크기 3단계: 0 보통 · 1 크게(처음 값) · 2 아주 크게
   function fsLv() { var v = U.store.get(BK); return v === '0' || v === '2' ? v : '1'; }
   // 오늘 맨 위: 인사 + 다음 단계까지 한 줄(누르면 매출 탭)
-  function v7Greet() {
-    var h = new Date().getHours(), hi = h < 11 ? '좋은 아침이에요' : h < 17 ? '오늘도 고생 많으세요' : '오늘 하루 수고 많으셨어요';
-    var nm = S.store ? S.store.name : '';
-    return '<section class="v7g"><p class="hi">' + hi + ',<br><b>' + esc(nm) + ' 사장님</b></p>' + (E().deadlineLabel ? '<p class="dl">' + esc(E().deadlineLabel) + '</p>' : '') + '</section>';
-  }
   // 새 소식 한 줄(본사·담당 SM 알림). 창으로 띄우는 건 급한 공지만
-  function v7News() {
-    ntLoad(); var L = ntUnread(); if (!L.length) return '';
-    var x = L[0];
-    return '<button type="button" class="v7n" data-act="more" data-tab="more" data-m="notice"><span class="k">' + BELL + '새 소식 <b>' + L.length + '</b></span><span class="t"><b>' + esc(x.title) + '</b><small>' + esc(x.from) + '</small></span><i aria-hidden="true">›</i></button>';
-  }
   // 오늘의 미션(티맵): 줄마다 오른쪽 [전화]·[보내기]. 큰 전화 버튼·'그다음 할 일' 묶음을 대신함
-  function v7Msn(pend, h0, n) {
-    var items = pend.length ? pend : [h0], tot = n + pend.length;
-    var rows = items.map(function (t, i) {
-      return '<li' + (i === 0 ? ' class="now"' : '') + '><span class="ic" aria-hidden="true">' + kindIc(t.p) + '</span><button type="button" class="tx" data-act="open" data-id="' + t.p.id + '"' + (t.k === 'doc' ? ' data-doc="1"' : '') + '><span class="t">' + todoTitle(t) + '</span><span class="s">' + esc([why(t), km(t.p)].filter(Boolean).join(' · ')) + '</span>' + '</button>' + todoAct(t) + '</li>';
-    });
-    var dn = n ? '<li class="dn1"><span class="cb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="t">오늘 <b>' + n + '곳</b> 연락했어요</span></li>' : '';
-    return '<section class="todo t3 fx-msn v7m" aria-label="오늘의 미션"><div class="v7mh"><h2>' + (pend.length ? '오늘의 미션' : '오늘 할 일은 끝! 한 곳 더 해 볼까요?') + '</h2>' + (pend.length ? '<span class="c"><b>' + n + '</b> / ' + tot + '</span>' : '') + '</div>' +
-      (pend.length ? '<span class="pb"><i data-w="' + Math.round(n / Math.max(tot, 1) * 100) + '"></i></span>' : '') +
-      '<ul>' + dn + rows.join('') + '</ul>' + '<button class="lnk2 l" type="button" data-act="tab" data-t="list">연락할 곳 모두 보기 ›</button></section>';
-  }
   // 받은 주문 한 줄
-  function v7Ord() {
-    var O = (S.data && S.data.orders) || []; if (!O.length) return '';
-    return '<button type="button" class="v7n o" data-act="tab" data-t="sales"><span class="k">받은 주문 <b>' + O.length + '</b>건</span><span class="t"><b>모두 ' + U.won(qtyAll()) + '인분</b><small>배달 날짜순으로 보기</small></span><i aria-hidden="true">›</i></button>';
-  }
   // 연락할 곳 위: 찾기 칸 + 받는 곳 고르기 + 칩 한 줄(카카오톡 채팅 위 '전체·안읽음'처럼)
-  function v7Flt(P, F, purposes) {
-    var CH = [['all', '전체'], ['again', '다시 연락'], ['hot', '관심·주문'], ['todo', '연락 전'], ['done', '연락함']], f0 = F[S.f] ? S.f : 'all';
-    return '<div class="v7s"><input id="q7" type="search" enterkeyhint="search" placeholder="이름으로 찾기" aria-label="이름으로 찾기" autocomplete="off" value="' + esc(S.q || '') + '">' +
-      (purposes.length > 1 ? '<select id="pf7" aria-label="받는 곳 종류">' + [['', '모든 곳']].concat(purposes.map(function (x) { return [x, x]; })).map(function (x) { return '<option value="' + esc(x[0]) + '"' + (S.pf === x[0] ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('') + '</select>' : '') + '</div>' +
-      '<div class="v7c" role="group" aria-label="연락 여부로 보기">' + CH.map(function (x) {
-        var cn = P.filter(F[x[0]]).length;
-        return '<button type="button" data-act="f" data-f="' + x[0] + '" aria-pressed="' + (f0 === x[0]) + '">' + x[1] + ' <b' + (x[0] === 'again' && cn ? ' class="red"' : '') + '>' + cn + '</b></button>';
-      }).join('') + '</div><p id="q7n" class="small" hidden>찾는 이름이 없어요. 아래 「목록에 없는 곳 추가」로 넣을 수 있어요.</p>';
-  }
   function qApply() {
     var q = String(S.q || '').replace(/\s/g, ''), n = 0;
     Array.prototype.forEach.call(document.querySelectorAll('.list.l2 li[data-nm]'), function (li) { var hit = !q || li.dataset.nm.replace(/\s/g, '').indexOf(q) >= 0; li.hidden = !hit; if (hit) n++; });
