@@ -212,12 +212,11 @@
       (e.mode === 'store' && s.how ? '<div class="after"><h3>이렇게 적어 주세요</h3><ol>' + s.how.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></div>' : '') + '</section>';
   }
   var CHV = '<i class="cv" aria-hidden="true">›</i>';
-  function mbar() { var t = curTab(); return t === 'more' && S.more ? appbar({ backAct: 'mback', title: S.more === 'docs' ? '제안서·키트 받기' : S.more === 'notice' ? '받은 알림' : S.more === 'games' ? '동지 게임' : '행사 안내' }) : appbar({}); }
+  function mbar() { var t = curTab(); return t === 'more' && S.more ? appbar({ backAct: 'mback', title: S.more === 'docs' ? '제안서·키트 받기' : S.more === 'notice' ? '받은 알림' : '행사 안내' }) : appbar({}); }
   function moreTab() {
     if (S.more === 'docs') return docsBox() || '<p class="small">이 행사에는 받을 자료가 없습니다.</p>';
     if (S.more === 'info') return infoSec();
     if (S.more === 'notice') return ntList();
-    if (S.more === 'games') return v8Games();
     return v8More();
     var big = U.store.get(BK) === '1';
     var hasP = window.Docs && window.Docs.of(E().id).props.length;
@@ -225,7 +224,7 @@
       '<button type="button" data-act="more" data-m="docs"><span><b>자료 받기</b><small>실행 키트 · 빈 제안서</small></span>' + CHV + '</button>' +
       '<button type="button" data-act="more" data-m="info"><span><b>행사 안내</b><small>누구에게 · 일정 · 메뉴 · 주의할 점</small></span>' + CHV + '</button>' +
       (S.evs && S.evs.length > 1 ? '<button type="button" data-act="events"><span><b>다른 행사 보기</b><small>' + S.evs.length + '개 행사</small></span>' + CHV + '</button>' : '') + '</div>' +
-      gameBox() + '<div class="mg">' + v7Fs() +
+      '<div class="mg">' + v7Fs() +
       '<button type="button" data-act="gon"><span><b>사용 안내 다시 보기</b><small>처음 쓰는 분 안내를 다시 봅니다</small></span>' + CHV + '</button></div>' +
       '<div class="mg"><div class="mi"><span><b>' + esc(S.store ? S.store.name : '') + '</b><small>' + (S.store && S.store.sm ? '담당 SM ' + esc(S.store.sm) + ' · 궁금한 점은 담당 SM에게 물어 주세요' : '궁금한 점은 담당 SM에게 물어 주세요') + '</small></span></div>' +
       '<button type="button" data-act="logout"><span><b>로그아웃</b></span></button></div></section>';
@@ -537,75 +536,9 @@
     var lin = function (c) { return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); }, L = .2126 * lin(r) + .7152 * lin(g) + .0722 * lin(b);
     return 1.05 / (L + .05) >= 4.5 ? '#ffffff' : '#161618';
   }
-  // 동지 게임(사용자 2026-11-19: 더보기에서 링크로 들어가고, 재밌으면 사장님이 손님께 자연스럽게 권하도록)
-  var GAMES = [
-    { id: 'royale', name: '팥알 배틀로얄', sub: '팥알끼리 밀어내기 · 한 판 1분', say: '팥죽 나오는 동안 이거 한 판 해 보세요. 팥알끼리 밀어내는 건데 은근히 승부욕 생겨요.', bg: '#2d6fe0', art: '<circle cx="22" cy="30" r="9" fill="#7a1d12"/><circle cx="40" cy="22" r="7" fill="#9b2a1b"/><circle cx="40" cy="40" r="8" fill="#ffd23f"/><circle cx="37.5" cy="37.5" r="2" fill="#fff8d6"/>' },
-    { id: 'fortune', name: '새알심 사주', sub: '생일로 보는 올해 운세와 어울리는 죽', say: '생일 넣으면 올해 운세랑 어울리는 죽을 골라 줘요. 재미로 한번 보세요.', bg: '#f1e6d2', art: '<rect x="17" y="15" width="28" height="30" rx="3" fill="#fffaf0" stroke="#b7a37f" stroke-width="1.5"/><path d="M23 24h16M23 30h16M23 36h10" stroke="#3a2f25" stroke-width="2" stroke-linecap="round"/><rect x="34" y="35" width="11" height="11" rx="2" fill="#c0392b"/>' },
-    { id: 'patal', name: '팥알 받기', sub: '떨어지는 팥알을 그릇에 · 아이들도 쉬워요', say: '떨어지는 팥알을 그릇에 받는 간단한 게임이에요. 아이들도 금방 해요.', bg: '#dde8f3', art: '<circle cx="24" cy="14" r="3.5" fill="#7a1d12"/><circle cx="36" cy="22" r="3.5" fill="#7a1d12"/><circle cx="30" cy="9" r="2" fill="#fff"/><path d="M14 33h34c0 8-7 14-17 14S14 41 14 33z" fill="#6E0E00"/><ellipse cx="31" cy="33" rx="17" ry="3.5" fill="#a8442f"/>' },
-    { id: 'grow', name: '동지까지 팥 키우기', sub: '하루 한 번 물 주기 · 동짓날 수확', say: '동짓날까지 휴대폰에서 팥을 키우는 게임이에요. 하루 한 번 물만 주면 돼요.', bg: '#f4ecd9', art: '<path d="M31 44V26" stroke="#2f7a3f" stroke-width="3" stroke-linecap="round"/><path d="M31 30c-8 0-12-5-12-10 7 0 12 4 12 10zM31 27c0-7 5-11 12-11 0 6-5 11-12 11z" fill="#3e9a4f"/><path d="M19 42h24l-3 9H22z" fill="#a0522d"/>' }
-  ];
-  function gArt(g, big) { return '<svg class="gart' + (big ? ' big' : '') + '" viewBox="0 0 62 62" aria-hidden="true"><rect width="62" height="62" rx="14" fill="' + g.bg + '"/>' + g.art + '</svg>'; }
-  // 게임은 같은 사이트 game/ 폴더. 주소 끝 ?s=<우리 매장 열쇠>로 들어온 손님에게만 우리 매장 혜택이 보임(2026-11-18 사용자: 서버 스위치+매장별 혜택)
-  function gUrl(id) { var k = S.gm && S.gm.ok && S.gm.key; return new URL('game/' + id + '.html' + (k ? '?s=' + k : ''), location.href).href; }
-  var QRC = {};
-  function qrSrc(u) { if (QRC[u]) return QRC[u]; if (!window.qrcode) return ''; try { var q = window.qrcode(0, 'M'); q.addData(u); q.make(); return (QRC[u] = q.createDataURL(8, 2)); } catch (e) { return ''; } }
-  function gmLoad() {
-    if (S.gmL || !S.token) return; S.gmL = 1;
-    U.rpc('owner_game', { p_token: S.token }).then(function (r) { S.gm = r && r.ok ? r : { ok: false, reason: (r && r.reason) || 'net' }; if (r && r.reason === 'auth') return drop('다시 들어와 주세요.'); render(); });
-  }
-  function perkState() {
-    var m = S.gm;
-    if (!m) return ['', '불러오는 중입니다'];
-    if (!m.ok) return ['t-idle', '지금은 불러오지 못했어요'];
-    if (!m.global) return ['t-warn', '본사가 잠시 멈췄어요'];
-    if (m.on) return ['t-ok', '켜짐'];
-    if (m.by_sm) return ['t-warn', '본사가 껐어요'];
-    return ['t-idle', '꺼짐'];
-  }
-  var GIFT = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.6-3.6-6-3.8-6-1.3C6 7 9 7 12 7zm0 0c1.6-3.6 6-3.8 6-1.3C18 7 15 7 12 7z"/></svg>';
-  function perkRow() {
-    gmLoad();
-    var st = perkState(), m = S.gm, sub = !m || !m.ok ? st[1] : m.on && m.global ? '“' + esc(m.text) + '”' : m.on ? '켜 두었지만 지금은 손님께 보이지 않아요' : m.by_sm ? '문구를 고쳐 다시 켤 수 있어요' : '게임 끝 화면에 우리 매장 혜택을 띄울 수 있어요';
-    return '<button type="button" class="grow2 gperk" data-act="perk"' + (m && m.ok ? '' : ' disabled') + '><span class="gic">' + GIFT + '</span><span class="gtx"><b>우리 매장 혜택</b><small>' + sub + '</small></span>' +
-      (st[0] ? '<span class="tag ' + st[0] + '">' + st[1] + '</span>' : '') + CHV + '</button>';
-  }
-  function gameBox() {
-    return '<section class="mg games" aria-label="손님과 즐기는 동지 게임"><div class="gh2"><b>손님과 즐기는 동지 게임</b><small>먼저 해 보시고, 재밌으면 손님께 권해 보세요</small></div>' + perkRow() +
-      GAMES.map(function (g) { return '<button type="button" class="grow2" data-act="game" data-g="' + g.id + '">' + gArt(g) + '<span><b>' + g.name + '</b><small>' + g.sub + '</small></span>' + CHV + '</button>'; }).join('') +
-      (window.OWNER_FX_PREVIEW ? '<button type="button" class="grow2 gall" data-act="gplay" data-u="' + esc(gUrl('index')) + '">' : '<a class="grow2 gall" href="' + esc(gUrl('index')) + '" target="_blank" rel="noopener">') + '<span><b>동지 게임 9가지 모두 보기</b><small>짝 맞추기·팥죽 젓기·역귀 막기 등</small></span>' + CHV + (window.OWNER_FX_PREVIEW ? '</button>' : '</a>') + '</section>';
-  }
-  var PEX = ['이 화면을 보여 주시면 단호박식혜 1개를 드려요', '게임 화면을 보여 주시면 새알심을 더 넣어 드려요', '동지 당일 포장 손님께 작은 선물을 드려요'];
-  function perkSheet() {
-    if (!S.psh || !S.gm || !S.gm.ok) return '';
-    var m = S.gm, t = S.ptx == null ? m.text : S.ptx;
-    return '<div class="shdim" data-act="pclose"></div><section class="sheet gsh psh" role="dialog" aria-modal="true" aria-labelledby="pT"><div class="grab" aria-hidden="true"></div>' +
-      '<div><h2 id="pT">우리 매장 혜택</h2><p class="small">우리 매장 게임 링크나 QR로 들어온 손님에게, 게임이 끝나면 이 문구가 보여요.</p></div>' +
-      (!m.global ? '<p class="box warn">본사가 모든 매장 혜택을 잠시 멈췄어요. 켜 두어도 지금은 손님께 보이지 않아요.</p>' : '') +
-      (m.by_sm && !m.on ? '<p class="box warn">본사가 이 매장 혜택을 껐어요. 문구를 고친 뒤 다시 켤 수 있어요.</p>' : '') +
-      '<label class="sw" for="swPerk"><span><b>손님께 혜택 보여 주기</b></span><input type="checkbox" id="swPerk" data-act="pon"' + (S.pon ? ' checked' : '') + '><i aria-hidden="true"></i></label>' +
-      '<label class="f" for="pTx">혜택 문구 (60자까지)<textarea id="pTx" maxlength="60" rows="2" placeholder="예: ' + PEX[0] + '">' + esc(t) + '</textarea></label>' +
-      '<div class="pex"><span class="small">예시를 누르면 칸에 들어가요</span>' + PEX.map(function (x, i) { return '<button class="mini" type="button" data-act="pex" data-i="' + i + '">' + x + '</button>'; }).join('') + '</div>' +
-      '<div class="pprev" aria-label="손님 화면 미리 보기"><b>오늘의 혜택</b><span class="s">' + esc(m.store || '우리 매장') + '</span><span class="t">' + (esc(String(t).trim()) || '혜택 문구를 넣어 주세요') + '</span><span class="n">계산할 때 이 화면을 보여 주세요.</span></div>' +
-      '<p class="small">혜택은 사장님이 정하고 지키는 약속이에요. 저장하면 손님 게임 화면에 바로 바뀌어요.</p>' +
-      '<button class="btn block" type="button" data-act="psave"' + (S.busy ? ' disabled' : '') + '>저장</button>' +
-      '<button class="btn ghost block" type="button" data-act="pclose">닫기</button></section>';
-  }
-  function gameSheet() {
-    var g = S.game && GAMES.find(function (x) { return x.id === S.game; }); if (!g) return '';
-    var url = gUrl(g.id), qs = S.gqr ? qrSrc(url) : '', on = S.gm && S.gm.ok && S.gm.on && S.gm.global;
-    return '<div class="shdim" data-act="gclose"></div><section class="sheet gsh" role="dialog" aria-modal="true" aria-labelledby="gT"><div class="grab" aria-hidden="true"></div>' +
-      '<div class="gtop">' + gArt(g, true) + '<div><h2 id="gT">' + g.name + '</h2><p class="small">' + g.sub + '</p></div></div>' +
-      (S.gqr ? '<div class="gqr">' + (qs ? '<img src="' + qs + '" alt="' + g.name + ' QR 코드"><p>손님이 휴대폰 카메라로 비추면 바로 열려요</p>' : '<p>QR을 만들지 못했어요. 손님께 보내기를 써 주세요.</p>') + '</div>'
-        : '<div class="gsay"><b>손님께 이렇게 권해 보세요</b><p>“' + esc(g.say) + '”</p></div>') +
-      (window.OWNER_FX_PREVIEW ? '<button class="btn block" type="button" data-act="gplay" data-u="' + esc(url) + '">먼저 해 보기</button>' : '<a class="btn block" href="' + esc(url) + '" target="_blank" rel="noopener">먼저 해 보기</a>') +
-      '<div class="ctl"><button class="btn ghost" type="button" data-act="gshare">손님께 보내기</button><button class="btn ghost" type="button" data-act="gqr">' + (S.gqr ? '권하는 말 보기' : 'QR 보여 주기') + '</button></div>' +
-      '<p class="small gnote">' + (on ? '이 링크와 QR로 들어온 손님은 게임이 끝나면 우리 매장 혜택 “' + esc(S.gm.text) + '”을 보게 돼요.' : '무료 게임이에요. 위 \'우리 매장 혜택\'을 켜면 게임 끝에 혜택을 보여 줄 수 있어요.') + ' 손님 점수는 손님 휴대폰에만 남아요.</p>' +
-      '<button class="btn ghost block" type="button" data-act="gclose">닫기</button></section>';
-  }
-
   // ── 받은 알림(2026-11-19 사용자: SM 사이트 알림 기능) ──
   // 담당 SM·팀장·본사가 보낸 알림. 오늘 맨 위 카드 + 더보기 '받은 알림' + '휴대폰 알림 받기'(웹 푸시)
-  function ntBusy() { return S.sheet || S.psh || S.game || S.view !== 'home'; }
+  function ntBusy() { return S.sheet || S.view !== 'home'; }
   function ntLoad(force) {
     if (!S.token) return; var now = Date.now();
     if (!force && S.ntL && now - S.ntL < 60000) return; S.ntL = now;
@@ -1053,25 +986,22 @@
     h += todayOrders(true);
     return h + '<p class="small v8nt">다른 매장 이름·점수는 보이지 않아요.</p>';
   }
-  // ── 더보기: 토스 '전체'처럼 묶음 3개(이번 행사 · 손님 게임 · 설정), 게임 9가지는 한 줄로 접고 들어가서 봄 ──
+  // ── 더보기: 토스 '전체'처럼 묶음 2개(이번 행사 · 설정) ──
   function v8More() {
     var hasP = window.Docs && window.Docs.of(E().id).props.length;
-    var nu = ntUnread().length; gmLoad();
+    var nu = ntUnread().length;
     return '<section class="menu v8mn" aria-label="더보기">' +
       '<h2 class="mh">이번 행사</h2><div class="mg">' +
       '<button type="button" data-act="more" data-m="notice"><span class="mic" aria-hidden="true">🔔</span><span><b>받은 알림</b><small>' + (nu ? '안 읽은 알림 ' + nu + '개' : '모두 읽었어요') + '</small></span>' + (nu ? '<em class="nb2">' + nu + '</em>' : '') + CHV + '</button>' +
       '<button type="button" data-act="more" data-m="docs"><span class="mic" aria-hidden="true">📄</span><span><b>제안서·키트 받기</b><small>' + (hasP ? '처음이시면 1분 설명부터' : '실행 키트 · 빈 제안서') + '</small></span>' + CHV + '</button>' +
       '<button type="button" data-act="more" data-m="info"><span class="mic" aria-hidden="true">📋</span><span><b>행사 안내</b><small>누구에게 · 일정 · 메뉴</small></span>' + CHV + '</button>' +
       (S.evs && S.evs.length > 1 ? '<button type="button" data-act="events"><span class="mic" aria-hidden="true">🗓️</span><span><b>다른 행사 보기</b><small>' + S.evs.length + '개 행사</small></span>' + CHV + '</button>' : '') + '</div>' +
-      '<h2 class="mh">손님과 즐기기</h2><div class="mg">' +
-      '<button type="button" data-act="more" data-m="games"><span class="mic" aria-hidden="true">🎮</span><span><b>동지 게임 9가지</b><small>' + esc(perkState()[1] ? '우리 매장 혜택 ' + perkState()[1] : '매장 혜택을 게임에 띄울 수 있어요') + '</small></span>' + CHV + '</button></div>' +
       '<h2 class="mh">설정</h2><div class="mg">' + v7Fs() +
       (FX('pushpre') && !S.pushOn ? '<button type="button" data-act="paon"><span class="mic" aria-hidden="true">📳</span><span><b>휴대폰 알림 받기</b><small>담당 SM·본사 소식을 바로 받아요</small></span>' + CHV + '</button>' : '') +
       '<button type="button" data-act="gon"><span class="mic" aria-hidden="true">💡</span><span><b>사용 안내 다시 보기</b><small>처음 쓰는 분 안내를 다시 봅니다</small></span>' + CHV + '</button></div>' +
       '<div class="mg"><div class="mi"><span class="mic" aria-hidden="true">🏠</span><span><b>' + esc(S.store ? S.store.name : '') + '</b><small>' + (S.store && S.store.sm ? '담당 SM ' + esc(S.store.sm) + ' · 궁금한 점은 담당 SM에게' : '궁금한 점은 담당 SM에게 물어 주세요') + '</small></span></div>' +
       '<button type="button" data-act="logout"><span><b>로그아웃</b></span></button></div></section>';
   }
-  function v8Games() { return '<section class="menu">' + gameBox() + '</section>'; }
   // 처음 안내: 실제 사이트에 들어간 사진 안내 창(guide.js FirstGuide)과 같은 창. 예전 첫 안내 4장·화면 짚기는 뺌(사용자 2026-11-23 '가이드 확실히, 훨씬 쉽게')
   function v8Guide() {
     if (S.view !== 'home' || !S.data || E().mode === 'hq' || !window.FirstGuide) return;
@@ -1185,7 +1115,7 @@
         '<div class="pbar"><div class="wrap">' + placeHint() + (p.tel ? '<button class="btn ghost" type="button" data-act="sheet">결과 적기</button><a class="btn" data-act="tel" href="' + telOf(p) + '">' + PH + '전화 걸기</a>'
           : '<a class="btn ghost" href="' + mapUrl(p) + '" target="_blank" rel="noopener noreferrer">지도에서 보기</a><button class="btn" type="button" data-act="sheet">결과 적기</button>') + '</div></div>' + sheet(p);
     }
-    app.innerHTML = h + (S.gplay ? '<div class="v7gp" role="dialog" aria-modal="true" aria-label="게임 미리 해 보기"><div class="gpb"><button type="button" data-act="gpx">‹ 앱으로 돌아가기</button><span>미리보기 안에서 여는 게임</span></div><iframe src="' + esc(S.gplay) + '" title="동지 게임"></iframe></div>' : '') + pvView() + (S.view === 'home' && curTab() === 'more' ? gameSheet() + perkSheet() : '') + obView() + tourView() + (obOpen() || S.tour >= 0 ? '' : bpView() + pnView());
+    app.innerHTML = h + pvView() + obView() + tourView() + (obOpen() || S.tour >= 0 ? '' : bpView() + pnView());
     // 행사 색 띠(보안 설정상 style 속성 대신 여기서 넣음)
     Array.prototype.forEach.call(app.querySelectorAll('[data-ec]'), function (el) { if (/^#[0-9a-fA-F]{3,8}$/.test(el.dataset.ec)) el.style.setProperty('--ec', tone(el.dataset.ec)); });
     Array.prototype.forEach.call(app.querySelectorAll('[data-w]'), function (el) { el.style.width = (+el.dataset.w || 0) + '%'; });
@@ -1194,7 +1124,6 @@
     var pc8 = app.querySelector('.v7c [aria-pressed=true]'); if (pc8 && pc8.offsetLeft > pc8.parentNode.clientWidth - pc8.offsetWidth - 16) pc8.parentNode.scrollLeft = pc8.offsetLeft - 16;
     Array.prototype.forEach.call(app.querySelectorAll('[data-x]'), function (el) { el.style.left = (+el.dataset.x || 0) + '%'; el.style.top = (+el.dataset.y || 0) + '%'; });
     var ec = myTheme() || (S.view !== 'events' ? E().color : ''); if (/^#[0-9a-fA-F]{3,8}$/.test(ec || '')) { document.documentElement.style.setProperty('--ec', tone(ec)); document.documentElement.style.setProperty('--on', ink(ec)); } else { document.documentElement.style.removeProperty('--ec'); document.documentElement.style.removeProperty('--on'); }
-    var ptx = U.$('pTx'); if (ptx) ptx.addEventListener('input', function () { S.ptx = ptx.value; var pv = app.querySelector('.pprev .t'); if (pv) pv.textContent = ptx.value.trim() || '혜택 문구를 넣어 주세요'; });
     var a = U.$('agree'); if (a) a.addEventListener('change', function () { U.$('agreeGo').disabled = !a.checked; });
     var lf = U.$('lf'); if (lf) lf.addEventListener('submit', login);
     var af = U.$('af'); if (af) af.addEventListener('submit', addPlace);
@@ -1247,7 +1176,7 @@
     S.dbusy = null; render();
   }
   function go(v) { S.pv = null; S.sheet = null; S.sheetCall = false; S.memoOpen = false; S.view = v; S.pick = null; S.err = null; S.del = null; S.form = {}; S.method = '전화'; S.mset = false; render(); window.scrollTo(0, 0); }
-  function drop(msg) { S.nt = null; S.ntL = 0; S.pchk = 0; S.pushOn = false; S.gm = null; S.gmL = 0; S.psh = false; S.demo = null; U.store.set('bj_owner_demo', null); S.token = null; S.data = null; S.evs = null; S.store = null; U.store.set(KEY, null); S.view = 'login'; S.err = msg || null; S.busy = false; render(); }
+  function drop(msg) { S.nt = null; S.ntL = 0; S.pchk = 0; S.pushOn = false; S.demo = null; U.store.set('bj_owner_demo', null); S.token = null; S.data = null; S.evs = null; S.store = null; U.store.set(KEY, null); S.view = 'login'; S.err = msg || null; S.busy = false; render(); }
   function fail(r) {
     if (r.reason === 'auth') return drop('로그인 시간이 끝났습니다. 다시 들어와 주세요.');
     S.busy = false;
@@ -1365,17 +1294,6 @@
     if (act === 'pvclose') { S.pv = null; render(); return; }
     if (act === 'mback') { S.more = null; render(); window.scrollTo(0, 0); return; }
     if (act === 'fagain') { S.tab = 'list'; S.f = 'again'; render(); window.scrollTo(0, 0); return; }
-    if (act === 'perk') { if (!S.gm || !S.gm.ok) return; S.psh = true; S.pon = !!S.gm.on; S.ptx = S.gm.text || ''; return render(); }
-    if (act === 'pclose') { S.psh = false; S.ptx = null; return render(); }
-    if (act === 'pon') { S.pon = !S.pon; var pt0 = U.$('pTx'); if (pt0) S.ptx = pt0.value; return render(); }
-    if (act === 'pex') { S.ptx = PEX[+b.dataset.i] || ''; return render(); }
-    if (act === 'psave') { var pt1 = U.$('pTx'); if (pt1) S.ptx = pt1.value; if (S.pon && !String(S.ptx || '').trim()) { var pt2 = U.$('pTx'); if (pt2) pt2.focus(); return U.toast('혜택 문구를 넣어 주세요'); } S.busy = true; render(); var pr = await U.rpc('owner_game_save', { p_token: S.token, p_on: !!S.pon, p_text: S.ptx || '' }); S.busy = false; if (!pr.ok) { if (pr.reason === 'auth') return drop('다시 들어와 주세요.'); render(); return U.toast(pr.reason === 'text' ? '혜택 문구를 넣어 주세요' : '저장하지 못했습니다. 잠시 뒤 다시 해 주세요'); } S.gm = pr; S.psh = false; S.ptx = null; render(); return U.toast(pr.on ? (pr.global ? '혜택을 켰습니다. 손님 게임 화면에 바로 보입니다' : '저장했습니다. 본사가 다시 켜면 보입니다') : '혜택을 껐습니다'); }
-    if (act === 'gplay') { S.gplay = b.dataset.u; S.game = null; return render(); }
-    if (act === 'gpx') { S.gplay = null; return render(); }
-    if (act === 'game') { S.game = b.dataset.g; S.gqr = false; return render(); }
-    if (act === 'gclose') { S.game = null; S.gqr = false; return render(); }
-    if (act === 'gqr') { S.gqr = !S.gqr; return render(); }
-    if (act === 'gshare') { var gg = GAMES.find(function (x) { return x.id === S.game; }); if (!gg) return; var gt = '본죽 동지 게임 \u2018' + gg.name + '\u2019 한번 해 보세요! ' + gg.sub, gu = gUrl(gg.id); if (navigator.share) { try { await navigator.share({ title: gg.name, text: gt, url: gu }); } catch (e) { } return; } var okc = window.Docs && await window.Docs.copy(gt + '\n' + gu); return U.toast(okc ? '링크를 복사했습니다. 문자나 카톡에 붙여 넣으세요' : '복사하지 못했습니다'); }
     if (act === 'theme') { var tc = /^#[0-9a-fA-F]{6}$/.test(b.dataset.c || '') ? b.dataset.c : null; U.store.set(TK, tc); render(); return U.toast(tc ? '앱 색을 바꿨습니다' : '행사 색으로 되돌렸습니다'); }
     if (act === 'big') { var fv = fsLv(), nv = fv === '0' ? '1' : fv === '1' ? '2' : '0'; U.store.set(BK, nv); applyBig(); render(); return U.toast(nv === '0' ? '글자를 보통 크기로 했습니다' : nv === '1' ? '글자를 크게 했습니다' : '글자를 아주 크게 했습니다'); }
     if (act === 'fs') { U.store.set(BK, b.dataset.v); applyBig(); return render(); }
